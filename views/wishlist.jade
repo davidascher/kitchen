@@ -1,0 +1,65 @@
+extends layout
+
+block content
+  p.lead
+    | Components the Appmaker users say they need
+
+  .col-sm-14.col-sm-offset-0
+    script(src="/js/wishlistUtils.js")
+    .col-sm-12.col-sm-offset-0
+      table.table.table-bordered.table-striped
+        thead
+          tr
+            th
+              | Component name
+            th.center-column
+              | Popularity
+        tbody
+          for component in components
+            tr
+              td
+                a(href="#{component.repo}")
+                  | #{component.name}
+              td.center-column
+                i(class="fa #{(component.fans.indexOf('testuser') != -1)?'fa-star':'fa-star-o'}",
+                  onclick="toggleStar(this, 'testuser', '#{component._id}')")
+                span(id="star-#{component._id}")
+                 | #{component.fans.length}
+                &nbsp;fans
+
+  .col-sm-14.col-sm-offset-0
+
+    form.form-horizontal(id='signup-form', method='POST')
+      legend Are there other components you wished we had?
+      p
+        | Let us know, and maybe someone will build one.  If they do and we find out about it,
+        | we'll let you know.  Your Github account will be associated with this request, so that
+        | developers may contact you to find out more about what you need if necessary.
+
+
+      .form-group
+        label.col-sm-5.control-label(for='needed') What would be a good name?
+        .col-sm-7
+          input.form-control(type='string', name='component_name', id='component_name', 
+              placeholder='e.g. Image Gallery', onchange="updateNames(this)", onkeyup="updateNames(this)")
+      .form-group
+        label.col-sm-5.control-label(for='needed') What would this component do?
+        .col-sm-7
+          textarea.form-control.component_description(id='description', name="description",
+            placeholder='e.g. "It would take images as inputs, let people swipe to show different images, and emit images when tapped."')
+          //- need to validate that repo is available for this user
+      .form-group
+        label.col-sm-5.control-label(for='needed') What kinds of apps do you think it could be used for?
+        .col-sm-7
+          textarea.form-control(type='string', name='sample_apps', id='sample_apps', placeholder='e.g. "apps to show people picures they take with their phones"')
+
+      .form-group
+        .col-sm-offset-5.col-sm-7
+          button.btn.btn-success(type='submit')
+            | Add to the wishlist
+
+  if user
+    .alert.alert-success.animated.flipInX
+      i.fa.fa-check
+      strong Success!
+      |  You are logged in.

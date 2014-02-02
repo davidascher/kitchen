@@ -1,0 +1,100 @@
+extends withsignin
+
+//- block content
+//-   p.lead
+//-     | Get your fresh Appmaker component repo here!
+
+block signedin
+  .col-sm-14.col-sm-offset-0.section
+
+    form.form-horizontal(id='signup-form', method='POST')
+      h2 What component do you want to build?
+      if (suggestions)
+        p
+          | Here are some components we know we need:
+        .form-group
+          ul.nav.nav-tabs
+            for suggestion in suggestions
+              li(class=defaultSuggestion==suggestion?'active':'')
+                a(data-toggle="tab", onclick="selectSuggestion('#{suggestion}')")
+                  | #{suggestion}
+
+            li
+              a(data-toggle="tab", onclick="selectSuggestion('new')")
+                | your own idea
+
+          .box.col-sm-12.well
+            for suggestion in suggestions
+              div(id="#{suggestion}", class="desc hidden")
+                h4 #{titles[suggestion]}
+                p #{descriptions[suggestion]}
+
+            div(id="new", class="desc hidden")
+                h4 Something new!
+                p
+                  |  If you have an original idea for a component, that's great!
+
+      script
+        | function selectSuggestion(suggestion) {
+        |    var items = document.querySelectorAll(".desc");
+        |    for (i = 0; i < items.length; i++) { // look up how to do forEach on nodeLists
+        |      items[i].classList.add('hidden');
+        |    };
+        |    var selector = "#"+suggestion;
+        |    document.querySelector(selector).classList.remove('hidden');
+        | }
+        | selectSuggestion("#{defaultSuggestion}")
+
+      script
+        | function updateNames(inputField) {
+        |   var name = inputField.value;
+        |   var repoName = name.replace(/[\W_]+/g, '-').replace(/^(\d)/, '_$1').toLowerCase();
+        |   document.querySelector('#repo_name').value = 'component-' + repoName;
+        |   var jsName = name.replace(/[\W_]+/g, '_').replace(/^(\d)/, '_$1').toLowerCase();
+        |   document.querySelector('#js_name').value = jsName;
+        |   checkIfReady();
+        | }
+
+        | function checkIfReady() {
+        |   if (document.querySelector("#component_name").value.length && 
+        |       document.querySelector("#repo_name").value.length && 
+        |       document.querySelector("#js_name").value.length) {
+        |     document.querySelector("#ready").classList.remove('disabled');
+        |     document.querySelector("#submit").removeAttribute('disabled');
+        |   } else {
+        |     document.querySelector("#ready").classList.add('disabled');
+        |     document.querySelector("#submit").setAttribute('disabled', 'true');
+        |   }
+        | }
+
+      legend Name your component
+      .form-group
+        label.col-sm-5.control-label(for='needed') Component Name
+        .col-sm-7
+          input.form-control(type='string', name='component_name', id='component_name', 
+              placeholder='e.g. Flickr Gallery', onchange="updateNames(this)", onkeyup="updateNames(this)")
+      .form-group
+        label.col-sm-5.control-label(for='needed') GitHub Repository name
+        .col-sm-7
+          input.form-control(type='string', name='repo_name', id='repo_name', 
+            placeholder='e.g. component-flickr-gallery', onchange="checkIfReady()", onkeyup="checkIfReady()")
+          //- need to validate that repo is available for this user
+      .form-group
+        label.col-sm-5.control-label(for='needed') Javascript name
+        .col-sm-7
+          input.form-control(type='string', name='js_name', id='js_name',
+            placeholder='e.g. flickr_gallery', onchange="checkIfReady()", onkeyup="checkIfReady()")
+
+      div.disabled#ready
+        legend Last step: create a Github repo for your component:
+        .form-group
+          .col-sm-offset-5.col-sm-7
+            button.btn.btn-success#submit(type='submit', disabled="true")
+              i.fa.fa-check
+              | Create GitHub repo
+
+  if user
+    .alert.alert-success.animated.flipInX
+      i.fa.fa-check
+      strong Success!
+      |  You are logged in.

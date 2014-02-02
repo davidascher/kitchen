@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  if (!user)
+    .col-sm-14.col-sm-offset-0
+      h2 Signin with GitHub
+      form(method='POST')
+        .form-group
+          .col-sm-offset-5.col-sm-7
+            //- (should be /github)
+            button.btn.btn-success(href='/auth/fakeauth')
+              i.fa.fa-github
+              | Sign-in
+
+  .opaque
+    block signedin
