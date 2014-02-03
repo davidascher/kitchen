@@ -23,6 +23,7 @@ var mycomponentsController = require('./controllers/mycomponents');
 var userController = require('./controllers/user');
 var apiController = require('./controllers/api');
 var contactController = require('./controllers/contact');
+var Component = require('./models/Component');
 
 /**
  * API keys + Passport configuration.
@@ -55,7 +56,7 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.compress());
-app.use(express.favicon());
+app.use(express.favicon('favicon.ico'));
 app.use(express.logger('dev'));
 app.use(express.cookieParser());
 app.use(express.json());
@@ -73,6 +74,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(function(req, res, next) {
   res.locals.user = req.user;
+  // Component.acquireWishlist(req, res, next);
+
   res.locals.suggestions = ['gallery', 'facebook', 'twitter'];
   res.locals.defaultSuggestion = res.locals.suggestions[0];
   res.locals.descriptions = {};
@@ -85,6 +88,7 @@ app.use(function(req, res, next) {
   res.locals.titles['twitter']='Twitter Share';
   next();
 });
+// app.use(Component.wishlist);
 app.use(flash());
 app.use(less({ src: __dirname + '/public', compress: true }));
 app.use(app.router);
