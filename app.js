@@ -9,7 +9,7 @@ var less = require('less-middleware');
 var path = require('path');
 var mongoose = require('mongoose');
 var passport = require('passport');
-var expressValidator = require('express-validator');
+// var expressValidator = require('express-validator');
 
 var app = express();
 
@@ -58,11 +58,11 @@ app.set('view engine', 'jade');
 app.use(express.compress());
 app.use(express.favicon('favicon.ico'));
 app.use(express.logger('dev'));
-app.use(express.cookieParser());
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(expressValidator());
+// app.use(expressValidator());
 app.use(express.methodOverride());
+app.use(express.cookieParser());
 app.use(express.session({
   secret: 'SECRET GOES HERE XXX',
   store: new MongoStore({
@@ -93,9 +93,9 @@ app.use(flash());
 app.use(less({ src: __dirname + '/public', compress: true }));
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: week }));
-app.use(function(req, res) {
-  res.render('404', { status: 404 });
-});
+// app.use(function(req, res) { // would be good to make it avoid /api calls
+//   res.render('404', { status: 404 });
+// });
 app.use(express.errorHandler());
 
 /**
@@ -120,8 +120,10 @@ app.post('/account/delete', passportConf.isAuthenticated, userController.postDel
 app.get('/account/unlink/:provider', passportConf.isAuthenticated, userController.getOauthUnlink);
 app.get('/api', apiController.getApi);
 app.post('/api/favorite', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.favorite);
+app.post('/api/createRepo', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.createRepo);
+app.post('/api/addToWishlist', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.addToWishlist);
 app.get('/api/github', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getGithub);
-app.get('/auth/github', passport.authenticate('github'));
+app.get('/auth/github', passport.authenticate('github', {scope: 'user,public_repo,repo,gist'}));
 app.get('/auth/github/callback', passport.authenticate('github', { successRedirect: '/', failureRedirect: '/login' }));
 
 app.listen(app.get('port'), function() {

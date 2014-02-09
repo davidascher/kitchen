@@ -8,6 +8,94 @@ var _ = require('underscore');
 var Github = require('github-api');
 var Component = require('../models/Component');
 
+var GitHubApi = require("github");
+var github = new GitHubApi({
+    // required
+    version: "3.0.0",
+    debug: true
+});
+
+exports.addToWishlist = function(req, res) {
+  var accessToken = req.user.tokens[0].accessToken;
+  var url = "https://api.github.com/repos/davidascher/kitchen/issues"
+  url += "?access_token="+encodeURIComponent(accessToken);
+  var options = {
+      url: url,
+      body: JSON.stringify(req.body),
+      headers: {
+          'User-Agent': 'NodeJS HTTP Client'
+      }
+  };
+  request.post(options, function(err, ret, body) {
+    if (err) {
+      res.json('500', err);
+    } else {
+      res.json('200');
+    }
+  });
+}
+
+exports.createRepo =function(req, res) {
+  console.log(req);
+  return;
+  var accessToken = req.user.tokens[0].accessToken;
+  var url = "https://api.github.com/user/repos"
+  url += "?access_token="+encodeURIComponent(accessToken);
+  var body = {};
+  body.name = req.body.repo_name;
+  body.has_wiki = false;
+  body.has_downloads = false;
+  body.auto_init = true;
+  var options = {
+      url: url,
+      body: JSON.stringify(req.body),
+      headers: {
+          'User-Agent': 'NodeJS HTTP Client'
+      }
+  };
+  request.post(options, function(err, ret, body) {
+    if (err) {
+      res.json('500', err);
+    } else {
+      var url = "https://api.github.com/repos/" + github_userid + '/' + req.body.repo_name;
+      url += "?access_token="+encodeURIComponent(accessToken);
+      var body = {};
+      body.default_branch = 'gh-pages';
+      var options = {
+          url: url,
+          body: JSON.stringify(req.body),
+          headers: {
+              'User-Agent': 'NodeJS HTTP Client'
+          }
+      };
+      request.patch(options, function(err, ret, body) {
+        
+      });
+
+      res.json('200');
+    }
+  });
+}
+
+exports.getWishlist = function(accessToken, errCB, okCB) {
+  var url = "https://api.github.com/repos/davidascher/kitchen/issues"
+  url += "?access_token="+encodeURIComponent(accessToken);
+  var options = {
+      url: url,
+      headers: {
+          'User-Agent': 'NodeJS HTTP Client'
+      }
+  };
+  request.get(options, function(err, ret, body) {
+    if (err) {
+      errCB && errCB(err);
+    } else {
+      okCB && okCB(ret, body);
+    }
+  });
+}
+
+
 /**
  * GET /api
  * List of API examples.

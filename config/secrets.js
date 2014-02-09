@@ -1,5 +1,5 @@
 module.exports = {
-  db: process.env.MONGOLAB_URI || process.env.MONGO_URI || 'mongodb://localhost/kitchen',
+  db: process.env.MONGOLAB_URI || process.env.MONGO_URI || 'mongodb://localhost/kitchen2',
 
   github: {
     clientID: process.env.GITHUB_CLIENTID,
